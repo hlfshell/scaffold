@@ -87,6 +87,39 @@ func TestOnceCreatesPrintsAndCleans(t *testing.T) {
 	}
 }
 
+func TestUpCreatesWritesEnvAndLeavesRunning(t *testing.T) {
+	service := &fakeService{
+		name: "app",
+		env:  map[string]string{"APP_URL": "http://localhost:8080"},
+	}
+	out := &bytes.Buffer{}
+	errOut := &bytes.Buffer{}
+	path := filepath.Join(t.TempDir(), ".env.example")
+	app := New("dev", service, WithWriters(out, errOut), WithEnvFile(path))
+
+	code := app.Run([]string{"up"})
+	if code != 0 {
+		t.Fatalf("unexpected exit code %d: %s", code, errOut.String())
+	}
+	if !service.created {
+		t.Fatal("expected service to be created")
+	}
+	if service.cleaned {
+		t.Fatal("did not expect up to clean up")
+	}
+	if out.String() != "dev up\n" {
+		t.Fatalf("unexpected output: %q", out.String())
+	}
+
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(contents) != "APP_URL=http://localhost:8080\n" {
+		t.Fatalf("unexpected env file: %s", string(contents))
+	}
+}
+
 func TestRunWithoutCommandsListsCommands(t *testing.T) {
 	service := &fakeService{name: "app"}
 	out := &bytes.Buffer{}

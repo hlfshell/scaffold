@@ -88,7 +88,7 @@ func WithTCPReady(port string, timeout time.Duration) ContainerServiceOption {
 				return fmt.Errorf("container did not publish port %s", port)
 			}
 
-			return WaitForTCP(ctx, "localhost", hostPort, timeout)
+			return WaitForTCP(ctx, "127.0.0.1", hostPort, timeout)
 		})
 	}
 }

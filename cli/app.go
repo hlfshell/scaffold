@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/signal"
 	"sort"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -191,7 +189,7 @@ func (app *App) MustRun(args []string) {
 type commands struct {
 	app *App
 
-	Up        upCommand        `cmd:"" help:"Start the service and keep it running until interrupted."`
+	Up        upCommand        `cmd:"" help:"Start the service and leave it running."`
 	Down      downCommand      `cmd:"" help:"Stop and remove resources for this service or stack."`
 	Once      onceCommand      `cmd:"" help:"Start the service, print connection details, then clean up."`
 	Run       runCommand       `cmd:"" help:"Start the service, run a registered command, then clean up."`
@@ -211,26 +209,21 @@ type upCommand struct {
 func (cmd upCommand) Run(app *App) error {
 	cmd.EnvFile = app.envFilePath(cmd.EnvFile)
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
-	ctx, cancel := context.WithTimeout(ctx, app.timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), app.timeout)
 	defer cancel()
 
 	if err := create(ctx, app.service); err != nil {
 		return err
 	}
 
-	if err := app.printInspect(ctx, cmd.EnvFile, cmd.NoEnv); err != nil {
-		_ = cleanup(context.Background(), app.service)
-		return err
+	if !cmd.NoEnv {
+		if err := writeEnvFile(cmd.EnvFile, env(app.service)); err != nil {
+			return err
+		}
 	}
 
-	fmt.Fprintln(app.out)
-	fmt.Fprintln(app.out, "Running. Press Ctrl+C to clean up.")
-	<-ctx.Done()
-
-	return cleanup(context.Background(), app.service)
+	fmt.Fprintf(app.out, "%s up\n", app.name)
+	return nil
 }
 
 type downCommand struct{}
@@ -472,7 +465,7 @@ func (app *App) printHelp() {
 	fmt.Fprintln(app.out, "  -h, --help    Show context-sensitive help.")
 	fmt.Fprintln(app.out)
 	fmt.Fprintln(app.out, "Commands:")
-	app.printHelpCommand("up [flags]", "Start the service and keep it running until interrupted.")
+	app.printHelpCommand("up [flags]", "Start the service and leave it running.")
 	app.printHelpCommand("down", "Stop and remove resources for this service or stack.")
 	if len(app.commands) > 0 {
 		app.printHelpCommand("run [<command> ...] [flags]", "Start the service, run a registered command, then clean up. Without a command, list registered commands.")

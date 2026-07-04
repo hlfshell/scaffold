@@ -1,8 +1,6 @@
 # scaffold
 
-<p align="center">
-  <img src="scaffold.png" alt="scaffold logo" width="240">
-</p>
+![scaffold logo](scaffold.png)
 
 ***tldr***
 

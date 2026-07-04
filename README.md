@@ -1,8 +1,10 @@
 # scaffold
 
-![scaffold logo](scaffold.png)
+<p align="center">
+  <img src="scaffold.png" alt="scaffold logo" width="320">
+</p>
 
-***tldr***
+### ***tldr***
 
 Deploy an entire local environment for testing, development, or client side app stacks - all presented as a dead simple tool.
 

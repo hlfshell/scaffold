@@ -115,6 +115,7 @@ func (c *Container) Start(ctx context.Context) (err error) {
 
 	containerConfig := &dockercontainer.Config{
 		Image:        fmt.Sprintf("%s:%s", c.image, c.tag),
+		Entrypoint:   c.entrypoint,
 		Cmd:          c.command,
 		Env:          env,
 		ExposedPorts: exposedPorts,
@@ -123,6 +124,7 @@ func (c *Container) Start(ctx context.Context) (err error) {
 	hostConfig := &dockercontainer.HostConfig{
 		Binds:        c.binds,
 		PortBindings: portBindings,
+		Privileged:   c.privileged,
 	}
 
 	networkConfig := &network.NetworkingConfig{}

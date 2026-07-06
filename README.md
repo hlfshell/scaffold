@@ -24,7 +24,7 @@ Some example stacks supported are:
 
 * `Postgres + Redis + API` for ordinary application development.
 * `Postgres + Qdrant + MinIO` for local RAG and document search workflows.
-* `LocalStack + app services` for S3, SQS, SNS, DynamoDB, and other AWS services.
+* `MiniStack + app services` for S3, SQS, SNS, DynamoDB, and other AWS-style services.
 * `MySQL + Memcached + worker` for cache-heavy backend development.
 
 ## The Basics
@@ -127,7 +127,7 @@ stack := scaffold.NewStack("app",
 For example, a RAG stack can own Postgres, Qdrant, and MinIO. An agent stack could in turn be built with this RAG stack in mind.
 
 ```go
-rag, err := presets.NewRAGStack("rag")
+rag, err := stacks.NewRAGStack("rag")
 if err != nil {
 	return err
 }

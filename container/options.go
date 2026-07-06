@@ -104,6 +104,25 @@ func WithCommand(command ...string) ContainerOption {
 }
 
 /*
+WithEntrypoint sets the container entrypoint. Most callers should prefer
+WithCommand unless the image entrypoint must be replaced.
+*/
+func WithEntrypoint(entrypoint ...string) ContainerOption {
+	return func(c *Container) {
+		c.entrypoint = entrypoint
+	}
+}
+
+/*
+WithPrivileged runs the container with Docker privileged mode enabled.
+*/
+func WithPrivileged() ContainerOption {
+	return func(c *Container) {
+		c.privileged = true
+	}
+}
+
+/*
 SetNetwork updates the Docker network name for the container. Stacks use
 this to attach services to a shared network before creation.
 */

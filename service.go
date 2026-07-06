@@ -23,8 +23,8 @@ Connectable is implemented by harnesses that can return a typed client
 or connection after the service is running.
 */
 type Connectable[T any] interface {
-	Connect() (T, error)
-	ConnectWithTimeout(timeout time.Duration) (T, error)
+	Connect(ctx context.Context) (T, error)
+	ConnectWithTimeout(ctx context.Context, timeout time.Duration) (T, error)
 }
 
 /*

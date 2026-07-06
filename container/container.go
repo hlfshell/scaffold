@@ -33,12 +33,14 @@ type Container struct {
 	env         map[string]string
 	image       string
 	tag         string
+	entrypoint  []string
 	command     []string
 	volumes     []string
 	binds       []string
 	networkName string
 	labels      map[string]string
 	hostIP      string
+	privileged  bool
 
 	lock sync.Mutex
 }

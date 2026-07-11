@@ -175,7 +175,7 @@ defer logs.Close()
 
 `scaffold` labels Docker resources so a Go-defined stack can find matching local infrastructure after application restart. Containers and shared stack networks are labeled when they are created. Explicitly created named volumes should use the same labels. Anonymous volumes created from image metadata generally cannot be labeled at creation time, though `scaffold` still tracks and removes the anonymous volumes it discovers on a container during cleanup.
 
-Labels allow local infrastructure to outlives the Go process that created it, but still be worked with later. This allows `scaffold` to:
+Labels allow local infrastructure to outlive the Go process that created it, but still be worked with later. This allows `scaffold` to:
 
 - `status` can find containers, networks, and volumes for a defined stack.
 - `down` can remove resources created by another process.
@@ -236,7 +236,7 @@ stack := scaffold.NewStack("app",
 )
 ```
 
-In this example, every labeled resource created by the stack receives `key= value` and `env=local`.
+In this example, every labeled resource created by the stack receives `key=value` and `env=local`.
 
 ## Generated names
 

@@ -367,6 +367,66 @@ err := scaffold.Run(ctx, stack, func(ctx context.Context) error {
 })
 ```
 
+## Generated CLI
+
+`scaffold/cli` can turn any `Service` or `Stack` into a small command-line application; this way your environment can easily become a prebuilt tool you can pass around to your team.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/hlfshell/scaffold"
+	"github.com/hlfshell/scaffold/cli"
+)
+
+func main() {
+	stack, err := NewDevStack()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	app := cli.New("dev",
+		stack,
+		cli.WithDescription("manage the local development stack"),
+		cli.WithEnvFile(".env.scaffold"),
+		cli.WithTimeout(2*time.Minute),
+		cli.WithCommand(cli.Command{
+			Name: "seed",
+			Help: "seed local development data",
+			Run: func(ctx context.Context, service scaffold.Service, args []string) error {
+				// Use the typed stack or service here to run app-specific work.
+				return nil
+			},
+		}),
+	)
+
+	app.MustRun(os.Args[1:])
+}
+```
+
+Then, from the directory containing that `main.go`, build it with `go build -o dev .` and run:
+
+```bash
+dev up              # start the service and leave it running
+dev once            # start, print details, then clean up
+dev run cmd        # start, run a registered command, then clean up
+dev down            # stop and remove matching resources
+dev status          # show running state for services and Docker resources
+dev summary         # print a service or stack summary
+dev env             # print environment variables in dotenv format
+dev endpoints       # print exposed endpoints, when any exist
+dev resources       # print discovered containers, networks, and volumes
+dev live            # open an interactive terminal controller
+```
+
+See `examples/dev-cli` for a complete executable example.
+
 ## Writing services
 
 Most simple container-backed services should start with `FromContainer`. It keeps the common case small: start one container, wait until it is ready, expose endpoints, and forward container logs.
